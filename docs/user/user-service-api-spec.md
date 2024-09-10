@@ -68,3 +68,60 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 ```
 </details>
 
+<details>
+<a id="login-user"></a>
+<summary><b>Login User</b></summary>
+
+**Endpoint:** `POST /api/auth/login`
+
+**Description:**  uthenticates a user and returns a token.
+
+- **Request Body:**
+```json
+{
+  "username": "johndoe",
+  "password": "password123"
+}
+```
+
+**Response Body (Success):**
+```json
+{
+  "data": {
+    "token": "jwt-token-example",
+    "expiredAt": 1694538000000
+  }
+}
+```
+
+**Response Body (Failed):**
+```json
+{
+  "errors": "Username or password wrong."
+}
+```
+</details>
+
+<details>
+<a id="logout"></a>
+<summary><b>Logout User</b></summary>
+
+**Endpoint:** `DELETE /api/auth/logout`
+
+**Description:**  Logs out a user by invalidating their token.
+
+**Response Body (Success):**
+```json
+{
+  "data": "OK"
+}
+```
+
+**Response Body (Failed):**
+```json
+{
+  "errors": "Error logging out user."
+}
+```
+</details>
+
