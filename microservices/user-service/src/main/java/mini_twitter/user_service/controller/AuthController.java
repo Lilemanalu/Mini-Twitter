@@ -3,11 +3,13 @@ package mini_twitter.user_service.controller;
 import mini_twitter.user_service.dto.LoginUserRequest;
 import mini_twitter.user_service.dto.TokenResponse;
 import mini_twitter.user_service.dto.WebResponse;
+import mini_twitter.user_service.entity.User;
 import mini_twitter.user_service.service.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +40,22 @@ public class AuthController {
         }
 
         return WebResponse.<TokenResponse>builder().data(tokenResponse).build();
+    }
+
+    @DeleteMapping(
+            path = "/api/auth/logout",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> logout(@RequestBody User user) {
+        logger.info("Received logout request for user: {}", user.getUsername());
+
+        try {
+            authService.logout(user);
+            logger.info("User {} successfully logged out", user.getUsername());
+            return WebResponse.<String>builder().data("OK").build();
+        } catch (Exception e) {
+            logger.error("Error logging out user {}: {}", user.getUsername(), e.getMessage());
+            return WebResponse.<String>builder().data("Error").build();
+        }
     }
 }
