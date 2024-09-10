@@ -3,14 +3,14 @@
 ## Tables
 
 ### 1. **Comments**
-| Column        | Type     | Description                                       |
-|---------------|----------|---------------------------------------------------|
-| `id`          | UUID     | Unique identifier for the comment.               |
-| `post_id`     | UUID     | Identifier of the associated post.               |
-| `user_id`     | UUID     | Identifier of the user who made the comment.     |
-| `comment`     | String   | The content of the comment.                      |
-| `created_at`  | DateTime | Timestamp when the comment was created.          |
-| `updated_at`  | DateTime | Timestamp when the comment was last updated.     |
+| Column        | Type     | Description                                       | Constraints                                   |
+|---------------|----------|---------------------------------------------------|-----------------------------------------------|
+| `id`          | UUID     | Unique identifier for the comment.                | Primary Key                                   |
+| `post_id`     | UUID     | Identifier of the associated post.                | Foreign Key referencing `Posts(id)`, Not Null |
+| `user_id`     | UUID     | Identifier of the user who made the comment.      | Foreign Key referencing `Users(id)`, Not Null |
+| `comment`     | String   | The content of the comment.                       | Not Null, Max Length (e.g., 500 characters)   |
+| `created_at`  | DateTime | Timestamp when the comment was created.           | Not Null                                      |
+| `updated_at`  | DateTime | Timestamp when the comment was last updated.      | Not Null                                      |
 
 ## Relations
 
