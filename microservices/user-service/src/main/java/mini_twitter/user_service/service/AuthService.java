@@ -59,4 +59,15 @@ public class AuthService {
     private Long next30Days() {
         return System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 30);
     }
+
+    @Transactional
+    public void logout(User user) {
+        logger.info("Logging out user with username: {}", user.getUsername());
+
+        user.setToken(null);
+        user.setTokenExpiredAt(null);
+        userRepository.save(user);
+
+        logger.info("User {} logged out successfully", user.getUsername());
+    }
 }
