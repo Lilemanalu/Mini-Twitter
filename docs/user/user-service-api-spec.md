@@ -37,38 +37,6 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 </details>
 
 <details>
-<a id="fetch-user-profile"></a>
-<summary><b>Fetch User Profile</b></summary>
-
-**Endpoint:** `GET /api/users/{userId}`
-
-**Description:**  Retrieves details of a specific user by their ID.
-
-**Request Parameters::**
-- userId: The unique identifier of the user whose profile is being fetched.
-
-**Response Body (Success):**
-```json
-{
-  "data": {
-    "id": "user-123",
-    "username": "johndoe",
-    "email": "johndoe@example.com",
-    "name": "John Doe",
-    "bio": "A passionate coder."
-  }
-}
-```
-
-**Response Body (Failed):**
-```json
-{
-  "errors": "User not found."
-}
-```
-</details>
-
-<details>
 <a id="login-user"></a>
 <summary><b>Login User</b></summary>
 
@@ -125,3 +93,34 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 ```
 </details>
 
+<details>
+<a id="fetch-user-profile"></a>
+<summary><b>Fetch User Profile</b></summary>
+
+**Endpoint:** `GET /api/users/{userId}`
+
+**Description:**  Retrieves details of a specific user by their ID.
+
+**Request Parameters::**
+- userId: The unique identifier of the user whose profile is being fetched.
+
+**Response Body (Success):**
+```json
+{
+  "data": {
+    "id": "user-123",
+    "username": "johndoe",
+    "email": "johndoe@example.com",
+    "name": "John Doe",
+    "bio": "A passionate coder."
+  }
+}
+```
+
+**Response Body (Failed):**
+```json
+{
+  "errors": "User not found."
+}
+```
+</details>
