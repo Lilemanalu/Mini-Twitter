@@ -16,6 +16,7 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
   "username": "johndoe",
   "email": "johndoe@example.com",
   "password": "password123",
+  "name": "John Doe",
   "bio": "A passionate coder."
 }
 ```
@@ -23,12 +24,7 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 **Response Body (Success):**
 ```json
 {
-  "data": {
-    "id": "user-123",
-    "username": "johndoe",
-    "email": "johndoe@example.com",
-    "bio": "A passionate coder."
-  }
+  "data": "OK"
 }
 ```
 
@@ -58,6 +54,7 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
     "id": "user-123",
     "username": "johndoe",
     "email": "johndoe@example.com",
+    "name": "John Doe",
     "bio": "A passionate coder."
   }
 }
