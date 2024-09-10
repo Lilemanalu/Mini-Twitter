@@ -3,13 +3,13 @@
 ## Table
 
 ### 1. **Posts**
-| Column        | Type     | Description                                       |
-|---------------|----------|---------------------------------------------------|
-| `id`          | UUID     | Unique identifier for the post.                  |
-| `user_id`     | UUID     | Identifier of the user who created the post.     |
-| `content`     | String   | Content of the post (text).                      |
-| `created_at`  | DateTime | Timestamp when the post was created.             |
-| `updated_at`  | DateTime | Timestamp when the post was last updated.        |
+| Column        | Type     | Description                                       | Constraints                                   |
+|---------------|----------|---------------------------------------------------|-----------------------------------------------|
+| `id`          | UUID     | Unique identifier for the post.                   | Primary Key                                   |
+| `user_id`     | UUID     | Identifier of the user who created the post.      | Foreign Key referencing `Users(id)`, Not Null |
+| `content`     | String   | Content of the post (text).                       | Not Null, Max Length (e.g., 1000 characters)  |
+| `created_at`  | DateTime | Timestamp when the post was created.              | Not Null                                      |
+| `updated_at`  | DateTime | Timestamp when the post was last updated.         | Not Null                                      |
 
 ## Relations
 
