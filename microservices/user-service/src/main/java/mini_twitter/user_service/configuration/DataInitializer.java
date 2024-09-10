@@ -29,7 +29,7 @@ public class DataInitializer {
                 LocalDateTime now = LocalDateTime.now();
 
                 userRepository.save(new User(
-                        UUID.randomUUID().toString(), // ID
+                        "1", // ID
                         "johndoe", // username
                         "johndoe@example.com", // email
                         BCrypt.hashpw("password123", BCrypt.gensalt()), // password (hashed)
@@ -45,7 +45,7 @@ public class DataInitializer {
                         UUID.randomUUID().toString(),
                         "janedoe",
                         "janedoe@example.com",
-                        BCrypt.hashpw("password123", BCrypt.gensalt()),
+                        "password123",
                         "Jane Doe",
                         "Loves to write code.",
                         now,
