@@ -3,6 +3,7 @@ package mini_twitter.user_service.service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import mini_twitter.user_service.dto.RegisterUserRequest;
+import mini_twitter.user_service.dto.UserResponse;
 import mini_twitter.user_service.entity.User;
 import mini_twitter.user_service.repository.UserRepository;
 import mini_twitter.user_service.security.BCrypt;
@@ -49,5 +50,31 @@ public class UserService {
 
         userRepository.save(user);
         logger.info("User registration successful for username: {}", request.getUsername());
+    }
+
+    //get user by food ID
+    public UserResponse get(String id) {
+        logger.debug("Fetching user item with ID: {}", id);
+
+        User user  = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("User not found with ID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        UserResponse response = toUserResponse(user);
+        logger.debug("Retrieved user: {}", response);
+
+        return response;
+    }
+
+    private UserResponse toUserResponse(User user){
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .name(user.getName())
+                .bio(user.getBio())
+                .build();
     }
 }
