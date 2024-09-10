@@ -49,11 +49,11 @@ Each service has its own database for data isolation and consistency, communicat
 
 ## 📑 API Endpoints
 Detailed information for each API endpoint:
-1. [User Service](docs/comment/user-service-api-spec.md)
-2. [Post Service](docs/comment/post-service-api-spec.md)
+1. [User Service](docs/user/user-service-api-spec.md)
+2. [Post Service](docs/post/post-service-api-spec.md)
 3. [Comment Service](docs/comment/comment-service-api-spec.md)
-4. [Like Service](docs/comment/like-service-api-spec.md)
-5. [Follow Service](docs/comment/follow-service-api-spec.md)
+4. [Like Service](docs/like/like-service-api-spec.md)
+5. [Follow Service](docs/follow/follow-service-api-spec.md)
 
 ## 🚀 Getting Started
 
