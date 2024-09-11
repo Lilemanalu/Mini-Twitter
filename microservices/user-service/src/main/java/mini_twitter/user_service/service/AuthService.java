@@ -61,11 +61,15 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(User user) {
-        logger.info("Logging out user with username: {}", user.getUsername());
+    public void logout(String token) {
+        logger.info("Logging out user with token: {}", token);
+
+        User user = userRepository.findFirstByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         user.setToken(null);
         user.setTokenExpiredAt(null);
+
         userRepository.save(user);
 
         logger.info("User {} logged out successfully", user.getUsername());
