@@ -1,6 +1,7 @@
 package mini_twitter.user_service.controller;
 
 import mini_twitter.user_service.dto.RegisterUserRequest;
+import mini_twitter.user_service.dto.UpdateUserRequest;
 import mini_twitter.user_service.dto.UserResponse;
 import mini_twitter.user_service.dto.WebResponse;
 import mini_twitter.user_service.service.UserService;
@@ -36,6 +37,31 @@ public class UserController {
             throw e;
         }
     }
+
+    @PutMapping(
+            path = "/api/users/{userId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> update(@RequestBody UpdateUserRequest request,
+                                      @RequestHeader("X-API-TOKEN") String token) {
+        logger.info("Received update request for user with token: {}", token);
+
+        try {
+            logger.debug("Update request body: {}", request);
+
+            userService.update(request, token);
+
+            logger.info("User update successful for token: {}", token);
+
+            return WebResponse.<String>builder().data("OK").build();
+        } catch (Exception e) {
+            logger.error("Error updating user with token {}: {}", token, e.getMessage(), e);
+
+            return WebResponse.<String>builder().data("Error").build();
+        }
+    }
+
 
     @GetMapping(
             path = "/api/users/{userId}",
