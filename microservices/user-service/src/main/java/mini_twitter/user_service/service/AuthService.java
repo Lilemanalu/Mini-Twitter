@@ -32,7 +32,7 @@ public class AuthService {
 
         logger.info("Attempting to login user with username: {}", request.getUsername());
 
-        User user = userRepository.findById(request.getUsername())
+        User user = userRepository.findFirstByUsername(request.getUsername())
                 .orElseThrow(() -> {
                     logger.warn("Login failed for username: {} - User not found", request.getUsername());
                     return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or password wrong");
