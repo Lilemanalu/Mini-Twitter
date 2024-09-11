@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthController {
@@ -46,15 +43,15 @@ public class AuthController {
             path = "/api/auth/logout",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> logout(@RequestBody User user) {
-        logger.info("Received logout request for user: {}", user.getUsername());
+    public WebResponse<String> logout(@RequestHeader("X-API-TOKEN") String token) {
+        logger.info("Received logout request with token: {}", token);
 
         try {
-            authService.logout(user);
-            logger.info("User {} successfully logged out", user.getUsername());
+            authService.logout(token);
+            logger.info("User successfully logged out");
             return WebResponse.<String>builder().data("OK").build();
         } catch (Exception e) {
-            logger.error("Error logging out user {}: {}", user.getUsername(), e.getMessage());
+            logger.error("Error logging out user with token {}: {}", token, e.getMessage());
             return WebResponse.<String>builder().data("Error").build();
         }
     }
