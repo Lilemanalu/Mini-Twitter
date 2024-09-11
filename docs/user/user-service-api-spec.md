@@ -78,6 +78,9 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 
 **Description:**  Logs out a user by invalidating their token.
 
+**Request Header:**
+- `X-API-TOKEN`: The user's authentication token (Mandatory).
+
 **Response Body (Success):**
 ```json
 {
@@ -94,6 +97,51 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 </details>
 
 <details>
+<a id="update-user"></a>
+<summary><b>Update User</b></summary>
+
+**Endpoint:** `PUT /api/users/{userId}`
+
+**Description:**  Updates the information of an existing user. The user must be authenticated to update their profile.
+
+**Request Parameters:**:
+- `useId` : The unique identifier of the user whose profile is being updated.
+
+**Request Header:**
+- `X-API-TOKEN`: The user's authentication token (Mandatory).
+
+- **Request Body:**
+```json
+{
+  "email": "newemail@example.com",
+  "password": "newpassword123",
+  "name": "New Name",
+  "bio": "Updated bio."
+}
+```
+
+**Response Body (Success):**
+```json
+{
+  "data": {
+    "id": "user-123",
+    "username": "johndoe",
+    "email": "newemail@example.com",
+    "name": "New Name",
+    "bio": "Updated bio."
+  }
+}
+```
+
+**Response Body (Failed):**
+```json
+{
+  "errors": "User not found or validation error."
+}
+```
+</details>
+
+<details>
 <a id="fetch-user-profile"></a>
 <summary><b>Fetch User Profile</b></summary>
 
@@ -102,7 +150,7 @@ Welcome to the Mini Twitter API documentation. This guide provides a comprehensi
 **Description:**  Retrieves details of a specific user by their ID.
 
 **Request Parameters::**
-- userId: The unique identifier of the user whose profile is being fetched.
+- `userId`: The unique identifier of the user whose profile is being fetched.
 
 **Response Body (Success):**
 ```json
