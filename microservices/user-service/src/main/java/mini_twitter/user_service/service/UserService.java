@@ -3,6 +3,7 @@ package mini_twitter.user_service.service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import mini_twitter.user_service.dto.RegisterUserRequest;
+import mini_twitter.user_service.dto.UpdateUserRequest;
 import mini_twitter.user_service.dto.UserResponse;
 import mini_twitter.user_service.entity.User;
 import mini_twitter.user_service.repository.UserRepository;
@@ -64,6 +65,32 @@ public class UserService {
 
         UserResponse response = toUserResponse(user);
         logger.debug("Retrieved user: {}", response);
+
+        return response;
+    }
+
+    // Update user
+    public UserResponse update(UpdateUserRequest request, String token) {
+        logger.info("Starting update process for user with token: {}", token);
+
+        User user = userRepository.findFirstByToken(token)
+                .orElseThrow(() -> {
+                    logger.error("User not found with token: {}", token);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        logger.info("User found: {}", user);
+
+        user.setEmail(request.getEmail());
+        user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        user.setName(request.getName());
+        user.setBio(request.getBio());
+
+        userRepository.save(user);
+        logger.info("User details updated successfully for token: {}", token);
+
+        UserResponse response = toUserResponse(user);
+        logger.debug("Converted user to response: {}", response);
 
         return response;
     }
