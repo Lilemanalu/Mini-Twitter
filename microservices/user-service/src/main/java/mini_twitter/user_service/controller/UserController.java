@@ -43,25 +43,23 @@ public class UserController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> update(@RequestBody UpdateUserRequest request,
-                                      @RequestHeader("X-API-TOKEN") String token) {
-        logger.info("Received update request for user with token: {}", token);
+    public WebResponse<UserResponse> update(@RequestBody UpdateUserRequest request,
+                                            @RequestHeader("X-API-TOKEN") String token,
+                                            @PathVariable("userId") String userId) {
+        logger.info("Received update request for userId: {} with token: {}", userId, token);
 
         try {
-            logger.debug("Update request body: {}", request);
+            UserResponse updatedUserResponse = userService.update(request, token, userId);
 
-            userService.update(request, token);
+            logger.info("User update successful for userId: {}", userId);
+            logger.debug("Updated user details: {}", updatedUserResponse);
 
-            logger.info("User update successful for token: {}", token);
-
-            return WebResponse.<String>builder().data("OK").build();
+            return WebResponse.<UserResponse>builder().data(updatedUserResponse).build();
         } catch (Exception e) {
-            logger.error("Error updating user with token {}: {}", token, e.getMessage(), e);
-
-            return WebResponse.<String>builder().data("Error").build();
+            logger.error("Error updating user with userId {} and token {}: {}", userId, token, e.getMessage(), e);
+            throw e;
         }
     }
-
 
     @GetMapping(
             path = "/api/users/{userId}",
