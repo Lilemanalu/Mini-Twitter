@@ -69,31 +69,37 @@ public class UserService {
         return response;
     }
 
-    // Update user
-    public UserResponse update(UpdateUserRequest request, String token) {
-        logger.info("Starting update process for user with token: {}", token);
+    //update user
+    public UserResponse update(UpdateUserRequest request, String token, String userId) {
+        logger.info("Starting update process for userId: {} with token: {}", userId, token);
 
-        User user = userRepository.findFirstByToken(token)
+        User currentUser = userRepository.findFirstByToken(token)
                 .orElseThrow(() -> {
                     logger.error("User not found with token: {}", token);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
                 });
 
-        logger.info("User found: {}", user);
+        if (!currentUser.getId().equals(userId)) {
+            logger.error("User ID from request {} does not match the user associated with token {}", userId, token);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to update this profile");
+        }
 
-        user.setEmail(request.getEmail());
-        user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
-        user.setName(request.getName());
-        user.setBio(request.getBio());
+        logger.info("User found: {}", currentUser);
 
-        userRepository.save(user);
-        logger.info("User details updated successfully for token: {}", token);
+        currentUser.setEmail(request.getEmail());
+        currentUser.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        currentUser.setName(request.getName());
+        currentUser.setBio(request.getBio());
 
-        UserResponse response = toUserResponse(user);
+        userRepository.save(currentUser);
+        logger.info("User details updated successfully for userId: {}", userId);
+
+        UserResponse response = toUserResponse(currentUser);
         logger.debug("Converted user to response: {}", response);
 
         return response;
     }
+
 
     private UserResponse toUserResponse(User user){
         return UserResponse.builder()
