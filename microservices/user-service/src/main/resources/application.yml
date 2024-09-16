@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: mini-twitter
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/user-service-db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
