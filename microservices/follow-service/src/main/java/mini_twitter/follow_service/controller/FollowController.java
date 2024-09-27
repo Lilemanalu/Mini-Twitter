@@ -70,4 +70,21 @@ public class FollowController {
         }
     }
 
+    @GetMapping(
+            path = "/api/users/{userId}/following",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<List<UserResponseDto>> getFollowing(@PathVariable String userId) {
+        logger.info("Request to fetch following for user ID: {}", userId);
+
+        try {
+            WebResponseDto<List<UserResponseDto>> response = followService.getFollowing(userId);
+            logger.info("Successfully fetched following for user ID: {}", userId);
+            return response;
+        } catch (Exception e) {
+            logger.error("Error fetching following for user ID: {}", userId, e);
+            throw e;
+        }
+    }
+
 }
