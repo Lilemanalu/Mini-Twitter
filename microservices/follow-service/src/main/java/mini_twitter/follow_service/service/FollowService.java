@@ -54,4 +54,21 @@ public class FollowService {
         logger.info("Follower ID: {} successfully followed User ID: {}", followerId, userId);
         return WebResponseDto.<String>builder().data("You are now following user-" + userId + ".").build();
     }
+
+    @Transactional
+    public WebResponseDto<String> unfollowUser(String userId, String token) {
+        logger.info("Received unfollow request. User ID to unfollow: {}, Token: {}", userId, token);
+
+        // Get the ID of the follower from the token
+        String followerId = userServiceClient.getUserIdFromToken(token);
+
+        if (!followRepository.existsByUserIdAndFollowerId(userId, followerId)) {
+            logger.warn("Follower ID: {} is not following User ID: {}", followerId, userId);
+            throw new IllegalArgumentException("You are not following this user.");
+        }
+
+        followRepository.deleteByUserIdAndFollowerId(userId, followerId);
+        logger.info("Follower ID: {} successfully unfollowed User ID: {}", followerId, userId);
+        return WebResponseDto.<String>builder().data("You have unfollowed user-" + userId + ".").build();
+    }
 }
