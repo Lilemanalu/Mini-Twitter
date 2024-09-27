@@ -16,7 +16,7 @@ public class UserServiceClient {
     private RestTemplate restTemplate;
 
     public String getUserIdFromToken(String token) {
-        String url = "http://localhost:8080/api/token/" + token;
+        String url = "http://localhost:8080/api/users/me";
 
         try {
             return restTemplate.getForObject(url, String.class);
