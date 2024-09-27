@@ -1,5 +1,6 @@
 package mini_twitter.follow_service.controller;
 
+import mini_twitter.follow_service.dto.UserResponseDto;
 import mini_twitter.follow_service.dto.WebResponseDto;
 import mini_twitter.follow_service.service.FollowService;
 import org.slf4j.Logger;
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class FollowController {
@@ -46,6 +49,23 @@ public class FollowController {
             return response;
         } catch (Exception e) {
             logger.error("Error unfollowing user ID: {}", userId, e);
+            throw e;
+        }
+    }
+
+    @GetMapping(
+            path = "/api/users/{userId}/followers",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<List<UserResponseDto>> getFollowers(@PathVariable String userId) {
+        logger.info("Request to fetch followers for user ID: {}", userId);
+
+        try {
+            WebResponseDto<List<UserResponseDto>> response = followService.getFollowers(userId);
+            logger.info("Successfully fetched followers for user ID: {}", userId);
+            return response;
+        } catch (Exception e) {
+            logger.error("Error fetching followers for user ID: {}", userId, e);
             throw e;
         }
     }
