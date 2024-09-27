@@ -92,4 +92,21 @@ public class FollowService {
         return WebResponseDto.<List<UserResponseDto>>builder().data(followerDtos).build();
     }
 
+    public WebResponseDto<List<UserResponseDto>> getFollowing(String userId) {
+        logger.info("Fetching following for User ID: {}", userId);
+        List<Follow> following = followRepository.findByFollowerId(userId);
+
+        if (following.isEmpty()) {
+            logger.warn("This user is not following anyone. User ID: {}", userId);
+            throw new IllegalArgumentException("This user is not following anyone.");
+        }
+
+        List<UserResponseDto> followingDtos = following.stream()
+                .map(follow -> userServiceClient.getUserById(follow.getUserId()))
+                .collect(Collectors.toList());
+
+        logger.info("Successfully fetched following for User ID: {}", userId);
+        return WebResponseDto.<List<UserResponseDto>>builder().data(followingDtos).build();
+    }
+
 }
