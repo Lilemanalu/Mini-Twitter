@@ -2,6 +2,7 @@ package mini_twitter.follow_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import mini_twitter.follow_service.dto.UserResponseDto;
 import mini_twitter.follow_service.dto.WebResponseDto;
 import mini_twitter.follow_service.repository.FollowRepository;
 import mini_twitter.follow_service.webclient.UserServiceClient;
@@ -11,7 +12,9 @@ import mini_twitter.follow_service.entity.Follow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,4 +74,22 @@ public class FollowService {
         logger.info("Follower ID: {} successfully unfollowed User ID: {}", followerId, userId);
         return WebResponseDto.<String>builder().data("You have unfollowed user-" + userId + ".").build();
     }
+
+    public WebResponseDto<List<UserResponseDto>> getFollowers(String userId) {
+        logger.info("Fetching followers for User ID: {}", userId);
+        List<Follow> followers = followRepository.findByUserId(userId);
+
+        if (followers.isEmpty()) {
+            logger.warn("No followers found for User ID: {}", userId);
+            throw new IllegalArgumentException("No followers found for this user.");
+        }
+
+        List<UserResponseDto> followerDtos = followers.stream()
+                .map(follow -> userServiceClient.getUserById(follow.getFollowerId()))
+                .collect(Collectors.toList());
+
+        logger.info("Successfully fetched followers for User ID: {}", userId);
+        return WebResponseDto.<List<UserResponseDto>>builder().data(followerDtos).build();
+    }
+
 }
