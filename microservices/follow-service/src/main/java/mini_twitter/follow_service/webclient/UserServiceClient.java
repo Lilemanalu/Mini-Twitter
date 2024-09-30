@@ -1,5 +1,6 @@
 package mini_twitter.follow_service.webclient;
 
+import mini_twitter.follow_service.dto.ApiResponseWrapper;
 import mini_twitter.follow_service.dto.UserResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,14 @@ public class UserServiceClient {
         String url = "http://localhost:8081/api/users/" + userId;
 
         try {
-            return restTemplate.getForObject(url, UserResponseDto.class);
+            ApiResponseWrapper response = restTemplate.getForObject(url, ApiResponseWrapper.class);
+
+            if (response != null) {
+                return response.getData();
+            } else {
+                logger.error("No response received for user ID: {}", userId);
+                return null;
+            }
         } catch (Exception e) {
             logger.error("Error fetching user with ID: {}", userId, e);
             throw new RuntimeException("Failed to get user details");
