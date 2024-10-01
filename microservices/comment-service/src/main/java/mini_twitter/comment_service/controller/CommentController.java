@@ -43,4 +43,29 @@ public class CommentController {
         }
     }
 
+    @DeleteMapping(
+            path = "/api/posts/{postId}/comments/{commentId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<String> deleteComment(@RequestHeader("X-API-TOKEN") String token,
+                                                @PathVariable String postId,
+                                                @PathVariable String commentId) {
+        logger.info("Request to delete comment ID: {} for post ID: {}", commentId, postId);
+
+        try {
+            WebResponseDto<String> response = commentService.deleteComment(token, postId, commentId);
+
+            if (response.getErrors() == null || response.getErrors().isEmpty()) {
+                logger.info("Comment ID: {} successfully deleted for post ID: {}", commentId, postId);
+            } else {
+                logger.warn("Failed to delete comment ID: {} for post ID: {}. Error: {}", commentId, postId, response.getErrors());
+            }
+
+            return response;
+        } catch (Exception e) {
+            logger.error("Error occurred while deleting comment ID: {} for post ID: {}. Exception: {}", commentId, postId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }
