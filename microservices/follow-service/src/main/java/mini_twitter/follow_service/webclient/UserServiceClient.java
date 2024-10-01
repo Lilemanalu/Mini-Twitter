@@ -5,15 +5,12 @@ import mini_twitter.follow_service.dto.UserResponseDto;
 import mini_twitter.follow_service.dto.WebResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class UserServiceClient {
@@ -21,25 +18,34 @@ public class UserServiceClient {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceClient.class);
 
     @Autowired
-    private RestTemplate restTemplate;
+    private WebClient.Builder webClientBuilder;
 
     public String getUserIdFromToken(String token) {
         String url = "http://localhost:8081/api/users/me";
 
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-API-TOKEN", token);
+            logger.info("Fetching user ID from token: {}", token);
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+            WebClient webClient = webClientBuilder.baseUrl(url).build();
 
-            ResponseEntity<WebResponseDto<String>> response = restTemplate.exchange(
-                    url, HttpMethod.GET, entity, new ParameterizedTypeReference<WebResponseDto<String>>() {});
+            WebResponseDto<String> response = webClient.method(HttpMethod.GET)
+                    .uri(url)
+                    .header("X-API-TOKEN", token)  // Menggunakan X-API-TOKEN sesuai yang kamu sebutkan
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<WebResponseDto<String>>() {})
+                    .block();
 
-            return response.getBody().getData();
-        } catch (HttpClientErrorException e) {
-            logger.error("Error fetching user ID from token: {} - Status Code: {}, Response Body: {}",
-                    token, e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Failed to get user ID from token", e);
+            if (response == null || response.getData() == null) {
+                logger.error("Null response or no user ID found for token: {}", token);
+                throw new RuntimeException("Failed to get user ID from token: Null response");
+            }
+
+            String userId = response.getData();
+            logger.info("Successfully fetched user ID: {}", userId);
+
+            return userId;
+
         } catch (Exception e) {
             logger.error("Error fetching user ID from token: {}", token, e);
             throw new RuntimeException("Failed to get user ID from token", e);
@@ -51,17 +57,27 @@ public class UserServiceClient {
         String url = "http://localhost:8081/api/users/" + userId;
 
         try {
-            ApiResponseWrapper response = restTemplate.getForObject(url, ApiResponseWrapper.class);
+            logger.info("Fetching user details for user ID: {}", userId);
 
-            if (response != null) {
+            WebClient webClient = webClientBuilder.baseUrl(url).build();
+
+            ApiResponseWrapper response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(ApiResponseWrapper.class)
+                    .block();
+
+            if (response != null && response.getData() != null) {
+                logger.info("Successfully fetched user details for user ID: {}", userId);
                 return response.getData();
             } else {
-                logger.error("No response received for user ID: {}", userId);
+                logger.error("No response or user details found for user ID: {}", userId);
                 return null;
             }
+
         } catch (Exception e) {
             logger.error("Error fetching user with ID: {}", userId, e);
-            throw new RuntimeException("Failed to get user details");
+            throw new RuntimeException("Failed to get user details", e);
         }
     }
 }
