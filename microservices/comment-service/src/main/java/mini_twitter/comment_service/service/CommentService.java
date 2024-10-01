@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -86,6 +87,47 @@ public class CommentService {
         return WebResponseDto.<CommentResponseDto>builder()
                 .data(responseDto)
                 .build();
+    }
+
+    @Transactional
+    public WebResponseDto<String> deleteComment(String token, String postId, String commentId) {
+        logger.info("Request to delete comment ID: {} from post ID: {}", commentId, postId);
+
+        // Retrieve userId from token
+        String userId = userServiceClient.getUserIdFromToken(token);
+        if (userId == null) {
+            logger.warn("Unauthorized attempt to delete comment. Invalid token.");
+            return WebResponseDto.<String>builder()
+                    .errors("Unauthorized access. Invalid token.")
+                    .build();
+        }
+
+        logger.info("User ID retrieved from token: {}", userId);
+
+        // Find the comment by commentId
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+
+            // Check if the comment belongs to the specified post and the user is the comment owner
+            if (comment.getPostId().equals(postId) && comment.getUserId().equals(userId)) {
+                commentRepository.delete(comment);
+                logger.info("Comment ID: {} deleted successfully from post ID: {} by user ID: {}", commentId, postId, userId);
+                return WebResponseDto.<String>builder()
+                        .data("Comment deleted successfully.")
+                        .build();
+            } else {
+                logger.warn("Unauthorized access attempt to delete comment ID: {} by user ID: {}", commentId, userId);
+                return WebResponseDto.<String>builder()
+                        .errors("Unauthorized access. You can only delete your own comments.")
+                        .build();
+            }
+        } else {
+            logger.error("Comment ID: {} not found for post ID: {} or user ID: {} is not authorized to delete it.", commentId, postId, userId);
+            return WebResponseDto.<String>builder()
+                    .errors("Comment not found or you are not authorized to delete this comment.")
+                    .build();
+        }
     }
 
     private CommentResponseDto toCommentResponse(Comment comment) {
