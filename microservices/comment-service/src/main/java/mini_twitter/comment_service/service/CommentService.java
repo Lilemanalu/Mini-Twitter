@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -130,6 +132,28 @@ public class CommentService {
         }
     }
 
+    @Transactional
+    public WebResponseDto<List<CommentResponseDto>> getCommentsByPost(String postId) {
+        logger.info("Fetching comments for postId: {}", postId);
+
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        if (comments.isEmpty()) {
+            logger.warn("No comments found for postId: {}", postId);
+            return WebResponseDto.<List<CommentResponseDto>>builder()
+                    .errors("No comments found for this post.")
+                    .build();
+        }
+
+        List<CommentResponseDto> responseDtos = comments.stream()
+                .map(this::toCommentResponse)
+                .collect(Collectors.toList());
+
+        logger.info("Fetched {} comments for postId: {}", responseDtos.size(), postId);
+        return WebResponseDto.<List<CommentResponseDto>>builder()
+                .data(responseDtos)
+                .build();
+    }
+    
     private CommentResponseDto toCommentResponse(Comment comment) {
         return CommentResponseDto.builder()
                 .id(comment.getId())
