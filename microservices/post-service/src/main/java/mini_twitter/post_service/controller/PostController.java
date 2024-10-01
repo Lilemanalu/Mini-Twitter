@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PostController {
@@ -39,4 +36,23 @@ public class PostController {
             throw e;
         }
     }
+
+    @DeleteMapping(
+            path = "/api/posts/{postId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<String> deletePost(@RequestHeader("X-API-TOKEN") String token,
+                                             @PathVariable String postId) {
+        logger.info("Request to delete post ID: {}", postId);
+
+        try {
+            WebResponseDto<String> response = postService.deletePost(postId, token);
+            logger.info("Response for deleting post ID: {}: {}", postId, response);
+            return response;
+        } catch (Exception e) {
+            logger.error("Error deleting post ID: {}: {}", postId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }
