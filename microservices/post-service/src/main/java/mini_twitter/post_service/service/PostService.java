@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -115,6 +117,28 @@ public class PostService {
                     .errors("Post not found.")
                     .build();
         }
+    }
+
+    @Transactional
+    public WebResponseDto<List<PostResponseDto>> getUserPosts(String userId) {
+        logger.info("Fetching posts for userId: {}", userId);
+
+        List<Post> userPosts = postRepository.findAllByUserId(userId);
+        if (userPosts.isEmpty()) {
+            logger.warn("No posts found for userId: {}", userId);
+            return WebResponseDto.<List<PostResponseDto>>builder()
+                    .errors("No posts found for this user.")
+                    .build();
+        }
+
+        List<PostResponseDto> postResponses = userPosts.stream()
+                .map(this::toPostResponse)
+                .collect(Collectors.toList());
+
+        logger.info("Successfully fetched {} posts for userId: {}", postResponses.size(), userId);
+        return WebResponseDto.<List<PostResponseDto>>builder()
+                .data(postResponses)
+                .build();
     }
 
     private PostDetailResponseDto toPostDetailResponse(Post post) {
