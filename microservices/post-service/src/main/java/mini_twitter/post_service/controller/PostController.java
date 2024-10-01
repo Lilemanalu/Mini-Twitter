@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class PostController {
 
@@ -52,6 +54,28 @@ public class PostController {
             return response;
         } catch (Exception e) {
             logger.error("Error fetching post ID: {}: {}", postId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @GetMapping(
+            path = "/api/users/{userId}/posts",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponseDto<List<PostResponseDto>>> getUserPosts(@PathVariable String userId) {
+        logger.info("Request to fetch posts for userId: {}", userId);
+
+        try {
+            WebResponseDto<List<PostResponseDto>> response = postService.getUserPosts(userId);
+            if (response.getErrors() != null) {
+                logger.warn("No posts found for userId: {}", userId);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            logger.info("Successfully fetched posts for userId: {}", userId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error fetching posts for userId: {}: {}", userId, e.getMessage(), e);
             throw e;
         }
     }
