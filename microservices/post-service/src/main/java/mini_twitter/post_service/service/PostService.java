@@ -2,6 +2,7 @@ package mini_twitter.post_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import mini_twitter.post_service.dto.PostDetailResponseDto;
 import mini_twitter.post_service.dto.PostRequestDto;
 import mini_twitter.post_service.dto.PostResponseDto;
 import mini_twitter.post_service.dto.WebResponseDto;
@@ -93,6 +94,36 @@ public class PostService {
                     .errors("Post not found or you are not authorized to delete this post.")
                     .build();
         }
+    }
+
+    @Transactional
+    public WebResponseDto<PostDetailResponseDto> getPostDetail(String postId) {
+        logger.info("Fetching post details for postId: {}", postId);
+
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            logger.info("Post found for postId: {}", postId);
+
+            PostDetailResponseDto postDetailResponse = toPostDetailResponse(post);
+            return WebResponseDto.<PostDetailResponseDto>builder()
+                    .data(postDetailResponse)
+                    .build();
+        } else {
+            logger.warn("Post not found for postId: {}", postId);
+            return WebResponseDto.<PostDetailResponseDto>builder()
+                    .errors("Post not found.")
+                    .build();
+        }
+    }
+
+    private PostDetailResponseDto toPostDetailResponse(Post post) {
+        return PostDetailResponseDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 
     private PostResponseDto toPostResponse(Post post) {
