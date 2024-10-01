@@ -1,5 +1,6 @@
 package mini_twitter.post_service.controller;
 
+import mini_twitter.post_service.dto.PostDetailResponseDto;
 import mini_twitter.post_service.dto.PostRequestDto;
 import mini_twitter.post_service.dto.PostResponseDto;
 import mini_twitter.post_service.dto.WebResponseDto;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,6 +35,23 @@ public class PostController {
             return response;
         } catch (Exception e) {
             logger.error("Error creating post: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @GetMapping(
+            path = "/api/posts/{postId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<PostDetailResponseDto> getPostById(@PathVariable String postId) {
+        logger.info("Request to fetch post with ID: {}", postId);
+
+        try {
+            WebResponseDto<PostDetailResponseDto> response = postService.getPostDetail(postId);
+            logger.info("Successfully fetched post details for post ID: {}", postId);
+            return response;
+        } catch (Exception e) {
+            logger.error("Error fetching post ID: {}: {}", postId, e.getMessage(), e);
             throw e;
         }
     }
