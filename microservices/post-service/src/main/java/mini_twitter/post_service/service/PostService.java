@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,6 +63,36 @@ public class PostService {
         return WebResponseDto.<PostResponseDto>builder()
                 .data(responseDto)
                 .build();
+    }
+
+    @Transactional
+    public WebResponseDto<String> deletePost(String postId, String token) {
+        logger.info("Request to delete post ID: {}", postId);
+
+        String userId = userServiceClient.getUserIdFromToken(token);
+        logger.info("User ID retrieved from token: {}", userId);
+
+        Optional<Post> postOptional = postRepository.findById(postId);
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            if (post.getUserId().equals(userId)) {
+                postRepository.delete(post);
+                logger.info("Post ID: {} deleted successfully by user ID: {}", postId, userId);
+                return WebResponseDto.<String>builder()
+                        .data("Post deleted successfully.")
+                        .build();
+            } else {
+                logger.warn("Unauthorized access attempt to delete post ID: {} by user ID: {}", postId, userId);
+                return WebResponseDto.<String>builder()
+                        .errors("Unauthorized access. You can only delete your own posts.")
+                        .build();
+            }
+        } else {
+            logger.error("Post ID: {} not found or user ID: {} is not authorized to delete this post.", postId, userId);
+            return WebResponseDto.<String>builder()
+                    .errors("Post not found or you are not authorized to delete this post.")
+                    .build();
+        }
     }
 
     private PostResponseDto toPostResponse(Post post) {
