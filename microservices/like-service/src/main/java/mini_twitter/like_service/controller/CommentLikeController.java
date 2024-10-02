@@ -47,4 +47,20 @@ public class CommentLikeController {
             throw e;
         }
     }
+
+    @GetMapping(
+            path = "/api/comments/{commentId}/likes",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<Integer> getNumberOfLikesOnComment(@PathVariable String commentId) {
+        logger.info("Request to get number of likes for comment ID: {}", commentId);
+
+        try {
+            return commentLikeService.getNumberOfLikesOnComment(commentId);
+        } catch (Exception e) {
+            logger.error("Error getting number of likes for comment ID: {}", commentId, e);
+            throw e;
+        }
+    }
+
 }
