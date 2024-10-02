@@ -31,4 +31,20 @@ public class CommentLikeController {
             throw e;
         }
     }
+
+    @DeleteMapping(
+            path = "/api/comments/{commentId}/like",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<String> unlikeComment(@RequestHeader("X-API-TOKEN") String token,
+                                                @PathVariable String commentId) {
+        logger.info("Request to unlike comment ID: {} with token: {}", commentId, token);
+
+        try {
+            return commentLikeService.unlikeComment(token, commentId);
+        } catch (Exception e) {
+            logger.error("Error unliking comment ID: {}", commentId, e);
+            throw e;
+        }
+    }
 }
