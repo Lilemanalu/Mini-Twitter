@@ -48,4 +48,19 @@ public class PostLikeController {
         }
     }
 
+    @GetMapping(
+            path = "/api/posts/{postId}/likes",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<Integer> getNumberOfLikesOnPost(@PathVariable String postId) {
+        logger.info("Request to get number of likes for post ID: {}", postId);
+
+        try {
+            return postLikeService.getNumberOfLikesOnPost(postId);
+        } catch (Exception e) {
+            logger.error("Error getting number of likes for post ID: {}", postId, e);
+            throw e;
+        }
+    }
+
 }
