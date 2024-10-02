@@ -8,6 +8,8 @@ import mini_twitter.post_service.dto.PostResponseDto;
 import mini_twitter.post_service.dto.WebResponseDto;
 import mini_twitter.post_service.entity.Post;
 import mini_twitter.post_service.repository.PostRepository;
+import mini_twitter.post_service.webclient.CommentServiceClient;
+import mini_twitter.post_service.webclient.LikeServiceClient;
 import mini_twitter.post_service.webclient.UserServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,12 @@ public class PostService {
 
     @Autowired
     private UserServiceClient userServiceClient;
+
+    @Autowired
+    private CommentServiceClient commentServiceClient;
+
+    @Autowired
+    private LikeServiceClient likeServiceClient;
 
     @Transactional
     public WebResponseDto<PostResponseDto> createPost(String token, PostRequestDto request) {
@@ -107,7 +115,21 @@ public class PostService {
             Post post = postOptional.get();
             logger.info("Post found for postId: {}", postId);
 
-            PostDetailResponseDto postDetailResponse = toPostDetailResponse(post);
+            var comments = commentServiceClient.getCommentsByPostId(postId);
+            logger.info("Fetched {} comments for postId: {}", comments.size(), postId);
+
+            int likeCount = likeServiceClient.getLikesByPostId(postId);
+            logger.info("Fetched {} likes for postId: {}", likeCount, postId);
+
+            PostDetailResponseDto postDetailResponse = PostDetailResponseDto.builder()
+                    .id(post.getId())
+                    .userId(post.getUserId())
+                    .content(post.getContent())
+                    .createdAt(post.getCreatedAt())
+                    .comments(comments)
+                    .likes(likeCount)
+                    .build();
+
             return WebResponseDto.<PostDetailResponseDto>builder()
                     .data(postDetailResponse)
                     .build();
