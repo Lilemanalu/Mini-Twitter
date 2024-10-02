@@ -48,4 +48,22 @@ public class PostLikeService {
         return WebResponseDto.<String>builder().data("Post liked successfully.").build();
     }
 
+    @Transactional
+    public WebResponseDto<String> unlikePost(String token, String postId) {
+        log.info("Received request to unlike post ID: {} with token: {}", postId, token);
+
+        String userId = userServiceClient.getUserIdFromToken(token);
+
+        Optional<PostLike> existingLike = postLikeRepository.findByPostIdAndUserId(postId, userId);
+        if (existingLike.isEmpty()) {
+            log.warn("User ID: {} has not liked post ID: {}", userId, postId);
+            return WebResponseDto.<String>builder().errors("You have not liked this post.").build();
+        }
+
+        postLikeRepository.delete(existingLike.get());
+
+        log.info("User ID: {} successfully unliked post ID: {}", userId, postId);
+        return WebResponseDto.<String>builder().data("Post unliked successfully.").build();
+    }
+
 }
