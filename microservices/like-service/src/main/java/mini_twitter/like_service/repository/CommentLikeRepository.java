@@ -9,4 +9,6 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, String
 
     Optional<CommentLike> findByCommentIdAndUserId(String commentId, String userId);
 
+    int countByCommentId(String commentId);
+
 }
