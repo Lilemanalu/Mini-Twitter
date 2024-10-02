@@ -32,4 +32,20 @@ public class PostLikeController {
         }
     }
 
+    @DeleteMapping(
+            path = "/api/posts/{postId}/like",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponseDto<String> unlikePost(@RequestHeader("X-API-TOKEN") String token,
+                                             @PathVariable String postId) {
+        logger.info("Request to unlike post ID: {} with token: {}", postId, token);
+
+        try {
+            return postLikeService.unlikePost(token, postId);
+        } catch (Exception e) {
+            logger.error("Error unliking post ID: {}", postId, e);
+            throw e;
+        }
+    }
+
 }
