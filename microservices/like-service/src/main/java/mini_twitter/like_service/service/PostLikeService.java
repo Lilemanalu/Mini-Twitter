@@ -66,4 +66,11 @@ public class PostLikeService {
         return WebResponseDto.<String>builder().data("Post unliked successfully.").build();
     }
 
+    public WebResponseDto<Integer> getNumberOfLikesOnPost(String postId) {
+        log.info("Fetching like count for post ID: {}", postId);
+        int likeCount = postLikeRepository.countByPostId(postId);
+        log.info("Found {} likes for post ID: {}", likeCount, postId);
+        return WebResponseDto.<Integer>builder().data(likeCount).build();
+    }
+
 }
