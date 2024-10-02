@@ -44,4 +44,22 @@ public class CommentLikeService {
         return WebResponseDto.<String>builder().data("Comment liked successfully.").build();
     }
 
+    @Transactional
+    public WebResponseDto<String> unlikeComment(String token, String commentId) {
+        log.info("Received request to unlike comment ID: {} with token: {}", commentId, token);
+
+        String userId = userServiceClient.getUserIdFromToken(token);
+
+        Optional<CommentLike> existingLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId);
+        if (existingLike.isEmpty()) {
+            log.warn("User ID: {} has not liked comment ID: {}", userId, commentId);
+            return WebResponseDto.<String>builder().errors("You have not liked this comment.").build();
+        }
+
+        commentLikeRepository.delete(existingLike.get());
+
+        log.info("User ID: {} successfully unliked comment ID: {}", userId, commentId);
+        return WebResponseDto.<String>builder().data("Comment unliked successfully.").build();
+    }
+
 }
