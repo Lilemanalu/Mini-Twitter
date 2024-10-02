@@ -62,4 +62,11 @@ public class CommentLikeService {
         return WebResponseDto.<String>builder().data("Comment unliked successfully.").build();
     }
 
+    public WebResponseDto<Integer> getNumberOfLikesOnComment(String commentId) {
+        log.info("Fetching like count for comment ID: {}", commentId);
+        int likeCount = commentLikeRepository.countByCommentId(commentId);
+        log.info("Found {} likes for comment ID: {}", likeCount, commentId);
+        return WebResponseDto.<Integer>builder().data(likeCount).build();
+    }
+
 }
