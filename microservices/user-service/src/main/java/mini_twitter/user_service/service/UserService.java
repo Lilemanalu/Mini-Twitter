@@ -53,7 +53,7 @@ public class UserService {
         logger.info("User registration successful for username: {}", request.getUsername());
     }
 
-    //get user by food ID
+    //get user by user ID
     public UserResponse get(String id) {
         logger.debug("Fetching user item with ID: {}", id);
 
@@ -67,6 +67,22 @@ public class UserService {
         logger.debug("Retrieved user: {}", response);
 
         return response;
+    }
+
+    // get user ID by token
+    public String getUserIdByToken(String token) {
+        logger.info("Fetching user ID for token: {}", token);
+
+        // Fetch the user by token
+        User currentUser = userRepository.findFirstByToken(token)
+                .orElseThrow(() -> {
+                    logger.error("User not found with token: {}", token);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        logger.info("User found for token: {}", currentUser.getUsername());
+
+        return currentUser.getId();
     }
 
     //update user

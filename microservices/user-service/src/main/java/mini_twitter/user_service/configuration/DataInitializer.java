@@ -42,7 +42,7 @@ public class DataInitializer {
                 ));
 
                 userRepository.save(new User(
-                        UUID.randomUUID().toString(),
+                        "2",
                         "janedoe",
                         "janedoe@example.com",
                         "password123",
@@ -55,7 +55,7 @@ public class DataInitializer {
                 ));
 
                 userRepository.save(new User(
-                        UUID.randomUUID().toString(),
+                        "3",
                         "alexsmith",
                         "alexsmith@example.com",
                         BCrypt.hashpw("password123", BCrypt.gensalt()),
@@ -68,7 +68,7 @@ public class DataInitializer {
                 ));
 
                 userRepository.save(new User(
-                        UUID.randomUUID().toString(),
+                        "4",
                         "emilyjones",
                         "emilyjones@example.com",
                         BCrypt.hashpw("password123", BCrypt.gensalt()),
@@ -81,7 +81,8 @@ public class DataInitializer {
                 ));
 
                 userRepository.save(new User(
-                        UUID.randomUUID().toString(),
+//                        UUID.randomUUID().toString(),
+                        "5",
                         "michaelbrown",
                         "michaelbrown@example.com",
                         BCrypt.hashpw("password123", BCrypt.gensalt()),

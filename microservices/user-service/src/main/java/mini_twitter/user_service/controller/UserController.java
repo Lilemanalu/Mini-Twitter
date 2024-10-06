@@ -77,4 +77,22 @@ public class UserController {
             throw e;
         }
     }
+
+    @GetMapping(
+            path = "/api/users/me",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> getUserIdByToken(@RequestHeader("X-API-TOKEN") String token) {
+        logger.info("Received request to get user ID by token");
+
+        try {
+            String userId = userService.getUserIdByToken(token);
+            logger.info("Successfully retrieved user ID by token: {}", userId);
+            return WebResponse.<String>builder().data(userId).build(); // Return user ID
+        } catch (ResponseStatusException e) {
+            logger.error("Error retrieving user ID by token: {}. Error: {}", token, e.getMessage());
+            throw e;
+        }
+    }
+
 }
