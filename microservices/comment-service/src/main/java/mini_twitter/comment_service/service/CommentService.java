@@ -132,11 +132,19 @@ public class CommentService {
         }
     }
 
-    @Transactional
     public WebResponseDto<List<CommentResponseDto>> getCommentsByPost(String postId) {
         logger.info("Fetching comments for postId: {}", postId);
 
-        List<Comment> comments = commentRepository.findByPostId(postId);
+        List<Comment> comments;
+        try {
+            comments = commentRepository.findByPostId(postId);
+        } catch (Exception e) {
+            logger.error("Error fetching comments for postId: {}. Error: {}", postId, e.getMessage());
+            return WebResponseDto.<List<CommentResponseDto>>builder()
+                    .errors("Unable to fetch comments. Please try again later.")
+                    .build();
+        }
+
         if (comments.isEmpty()) {
             logger.warn("No comments found for postId: {}", postId);
             return WebResponseDto.<List<CommentResponseDto>>builder()
