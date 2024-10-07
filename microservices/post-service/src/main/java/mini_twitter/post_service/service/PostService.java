@@ -106,61 +106,71 @@ public class PostService {
         }
     }
 
-    @Transactional
     public WebResponseDto<PostDetailResponseDto> getPostDetail(String postId) {
         logger.info("Fetching post details for postId: {}", postId);
+        try {
+            Optional<Post> postOptional = postRepository.findById(postId);
+            if (postOptional.isPresent()) {
+                Post post = postOptional.get();
+                logger.info("Post found for postId: {}", postId);
 
-        Optional<Post> postOptional = postRepository.findById(postId);
-        if (postOptional.isPresent()) {
-            Post post = postOptional.get();
-            logger.info("Post found for postId: {}", postId);
+                var comments = commentServiceClient.getCommentsByPostId(postId);
+                logger.info("Fetched {} comments for postId: {}", comments.size(), postId);
 
-            var comments = commentServiceClient.getCommentsByPostId(postId);
-            logger.info("Fetched {} comments for postId: {}", comments.size(), postId);
+                int likeCount = likeServiceClient.getLikesByPostId(postId);
+                logger.info("Fetched {} likes for postId: {}", likeCount, postId);
 
-            int likeCount = likeServiceClient.getLikesByPostId(postId);
-            logger.info("Fetched {} likes for postId: {}", likeCount, postId);
+                PostDetailResponseDto postDetailResponse = PostDetailResponseDto.builder()
+                        .id(post.getId())
+                        .userId(post.getUserId())
+                        .content(post.getContent())
+                        .createdAt(post.getCreatedAt())
+                        .comments(comments)
+                        .likes(likeCount)
+                        .build();
 
-            PostDetailResponseDto postDetailResponse = PostDetailResponseDto.builder()
-                    .id(post.getId())
-                    .userId(post.getUserId())
-                    .content(post.getContent())
-                    .createdAt(post.getCreatedAt())
-                    .comments(comments)
-                    .likes(likeCount)
-                    .build();
-
+                return WebResponseDto.<PostDetailResponseDto>builder()
+                        .data(postDetailResponse)
+                        .build();
+            } else {
+                logger.warn("Post not found for postId: {}", postId);
+                return WebResponseDto.<PostDetailResponseDto>builder()
+                        .errors("Post not found.")
+                        .build();
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching post details for postId: {}. Exception: {}", postId, e.getMessage());
             return WebResponseDto.<PostDetailResponseDto>builder()
-                    .data(postDetailResponse)
-                    .build();
-        } else {
-            logger.warn("Post not found for postId: {}", postId);
-            return WebResponseDto.<PostDetailResponseDto>builder()
-                    .errors("Post not found.")
+                    .errors("An error occurred while fetching post details.")
                     .build();
         }
     }
 
-    @Transactional
     public WebResponseDto<List<PostResponseDto>> getUserPosts(String userId) {
         logger.info("Fetching posts for userId: {}", userId);
+        try {
+            List<Post> userPosts = postRepository.findAllByUserId(userId);
+            if (userPosts.isEmpty()) {
+                logger.warn("No posts found for userId: {}", userId);
+                return WebResponseDto.<List<PostResponseDto>>builder()
+                        .errors("No posts found for this user.")
+                        .build();
+            }
 
-        List<Post> userPosts = postRepository.findAllByUserId(userId);
-        if (userPosts.isEmpty()) {
-            logger.warn("No posts found for userId: {}", userId);
+            List<PostResponseDto> postResponses = userPosts.stream()
+                    .map(this::toPostResponse)
+                    .collect(Collectors.toList());
+
+            logger.info("Successfully fetched {} posts for userId: {}", postResponses.size(), userId);
             return WebResponseDto.<List<PostResponseDto>>builder()
-                    .errors("No posts found for this user.")
+                    .data(postResponses)
+                    .build();
+        } catch (Exception e) {
+            logger.error("Error fetching posts for userId: {}. Exception: {}", userId, e.getMessage());
+            return WebResponseDto.<List<PostResponseDto>>builder()
+                    .errors("An error occurred while fetching posts.")
                     .build();
         }
-
-        List<PostResponseDto> postResponses = userPosts.stream()
-                .map(this::toPostResponse)
-                .collect(Collectors.toList());
-
-        logger.info("Successfully fetched {} posts for userId: {}", postResponses.size(), userId);
-        return WebResponseDto.<List<PostResponseDto>>builder()
-                .data(postResponses)
-                .build();
     }
 
     private PostDetailResponseDto toPostDetailResponse(Post post) {
